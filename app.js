@@ -96,7 +96,7 @@ var serv = app.listen(port, function(){
   });
 
 
-  app.get('/timesheets/:id/:foreman', function(request, response){
+  app.get('/timesheets/:id/:foreman/:project/:formid/:d/:employees/:cc:/st', function(request, response){
     //bodyparser takes JSON, converts to object
     console.log(request.body); //body gets stored by the bodyParser^^^
 
@@ -107,8 +107,14 @@ var serv = app.listen(port, function(){
     //now actually create a todo from input from the User
     var tm = {
       UniqueID: request.params.id,
-      timein: tf,
-      foreman: request.params.foreman
+      foreman: request.params.foreman,
+      project: project,
+      formid: formid,
+      d:d,
+      ts: 'no',
+      employees: employees,
+      cost_code: cc,
+      timein:st
     }
 
     console.log(tm);
@@ -213,7 +219,7 @@ var addTeamsheet = function(entry, callback){
 
       console.log('\n\n\n\nENTRY:', entry);
 
-      return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.foreman +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
+      return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + entry.st +'\', \'' + entry.foreman +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
       // return mysqlConn.query('SELECT * FROM timesheets;', function(err, rows) {
         arr = rows;
         console.log('Result: ', rows);
