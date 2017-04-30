@@ -6,6 +6,7 @@ console.log(`***********ENVIRONMENT: `, env);
       //that file ^^ config.json will NOT be part of git repo
   //REQUIRE the JSON file --> parse into object
   var config = require('./config.json');
+  
   var envConfig = config[env]; //Stores JUST the config variables for current env
 
   console.log(Object.keys(envConfig));  //finds all the keys in env
