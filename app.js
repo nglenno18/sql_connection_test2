@@ -6,18 +6,31 @@ const port = process.env.PORT || 3000;
 var express = require('express');
 const mysql = require('mysql');
 
+
+const timestamps = [];
+
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
 
 var fs = require('fs');
 
+var minute = new Date();
+console.log('\nSTARTED :', minute.toString("hh:mm tt"));
+var second = minute.getSeconds();
+minute = minute.getMinutes();
+console.log('\t', minute);
+
+var schedule = require("node-schedule");
+var rule = new schedule.RecurrenceRule();
+// rule.minute = minute;
+rule.second = 1;
+rule.dayOfWeek = [0, new schedule.Range(0,6)];
+
 var connection = null;
 var mysql2 = require('mysql2');
 var url = require('url');
 var SocksConnection = require('socksjs');
-
-QUOTAGUARDSTATIC_URL = 'http://quotaguard10225:7bf9752701f9@proxy.quotaguard.com:9292';
 
 QUOTAGUARDSTATIC_URL = 'http://7zl0kq03hlfpvy:8t9f75KusaE2TDhlqd8XpjscKw@us-east-1-static.quotaguard.com:9293';
 
@@ -25,11 +38,30 @@ var serv = app.listen(port, function(){
   console.log('App listening on port %s', serv.address().port);
   console.log('Press Ctrl+C to quit');
 
-    app.get('/', function(err, res){
+  schedule.scheduleJob(rule, function(){
+    herokutest(function(array){
+      console.log('callback called', array);
+        return (array);
+    });
+  });
 
+  var rule2 = new schedule.RecurrenceRule();
+  rule2.second = 25;
+  rule2.dayOfWeek = [0, new schedule.Range(0,6)];
+  schedule.scheduleJob(rule2, function(){
+    herokutest(function(array){
+      console.log('callback called', array);
+        return (array);
+    });
+  })
+
+  app.get('/records', function(err, res){
+    res.status(200).send(timestamps);
+  });
+
+    app.get('/', function(err, res){
       herokutest(function(array){
         console.log('callback called', array);
-
           return res.status(200).send(array);
       });
 
@@ -130,7 +162,7 @@ var herokutest = function(callback){
 
   var socksConn = new SocksConnection(mysql_server_options, socks_options);
 
-  console.log(socksConn);
+  // console.log(socksConn);
   var mysql_options =  {
     database: 'db1',
     user: 'root',
@@ -143,13 +175,22 @@ var herokutest = function(callback){
   return mysqlConn.connect(function(err){
     if(err){console.log(err);}
     else{
-      return mysqlConn.query('SELECT 1+1 as test1;', function(err, rows, fields) {
-        // if (err) throw err;
+      console.log('\n\nDatabase Connected!');
+      var t = new Date();
+      console.log('TIME: ', t.toString("hh:mm: aa"));
+      console.log(t.toString("MMM/DD/yy   hh:mm: aa"));
+      timestamps.push(t.toString("mm/dd/yy   hh:mm: aa"));
 
+      return mysqlConn.query('SELECT 1+1 as test1;', function(err, rows, fields) {
         arr = rows;
         console.log('Result: ', rows);
 
         return mysqlConn.end(function(err){
+          if(err) return console.log(err);
+          console.log('\tDatabase DISCONNECTED!');
+          var t = new Date();
+          console.log('\t TIME: ', t.toString("hh:mm: tt"));
+          console.log('\n\n\n');
           callback(rows);
           //PERFECT --> now go to udemy, review how to config HEROKU env. variables to stuff?
         });
