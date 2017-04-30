@@ -25,6 +25,7 @@ var schedule = require("node-schedule");
 var rule = new schedule.RecurrenceRule();
 // rule.minute = minute;
 rule.second = 1;
+rule.minute = 30;
 rule.dayOfWeek = [0, new schedule.Range(0,6)];
 
 var connection = null;
@@ -45,15 +46,15 @@ var serv = app.listen(port, function(){
     });
   });
 
-  var rule2 = new schedule.RecurrenceRule();
-  rule2.second = 25;
-  rule2.dayOfWeek = [0, new schedule.Range(0,6)];
-  schedule.scheduleJob(rule2, function(){
-    herokutest(function(array){
-      console.log('callback called', array);
-        return (array);
-    });
-  })
+  // var rule2 = new schedule.RecurrenceRule();
+  // rule2.second = 25;
+  // rule2.dayOfWeek = [0, new schedule.Range(0,6)];
+  // schedule.scheduleJob(rule2, function(){
+  //   herokutest(function(array){
+  //     console.log('callback called', array);
+  //       return (array);
+  //   });
+  // })
 
   app.get('/records', function(err, res){
     res.status(200).send(timestamps);
