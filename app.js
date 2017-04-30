@@ -42,7 +42,7 @@ var SocksConnection = require('socksjs');
 
 var mysql_server_options = {
   host: process.env.HOST,
-  port: process.env.PORT
+  port: process.env.PORTE
 };
 
 var socks_options = {
