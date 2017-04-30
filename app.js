@@ -2,15 +2,14 @@ const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
 const publicPath = path.join(__dirname, '../public');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 var express = require('express');
 var bodyParser = require('body-parser');
-
 const mysql = require('mysql');
 
 
 var timestamps = [];
-
+require('./config/config.js');
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
@@ -25,31 +24,25 @@ console.log('\t', minute);
 
 var schedule = require("node-schedule");
 var rule = new schedule.RecurrenceRule();
-// rule.minute = minute;
 rule.second = 1;
 rule.minute = 0;
 rule.dayOfWeek = [0, new schedule.Range(0,6)];
 
 var connection = null;
 var mysql2 = require('mysql2');
-// var url = require('url');
-
-
-QUOTAGUARDSTATIC_URL = 'http://7zl0kq03hlfpvy:8t9f75KusaE2TDhlqd8XpjscKw@us-east-1-static.quotaguard.com:9293';
+var url = require('url');
 
 var SocksConnection = require('socksjs');
-var options, url, proxy;
-// http = require("http");
-url = require("url");
-proxy = url.parse(QUOTAGUARDSTATIC_URL); // <-- proxy url
+var options, proxy;
+proxy = url.parse(process.env.QUOTAGUARDSTATIC_URL); // <-- proxy url
 var username = proxy.auth.split(':')[0];
 var password = proxy.auth.split(':')[1];
 
 var SocksConnection = require('socksjs');
 
 var mysql_server_options = {
-  host: '107.178.214.50',
-  port: 3306
+  host: process.env.HOST,
+  port: process.env.PORT
 };
 
 var socks_options = {
@@ -156,9 +149,9 @@ var findTimesheet = function(id, callback){
 
   // console.log(socksConn);
   var mysql_options =  {
-    database: 'db1',
-    user: 'root',
-    password: 'nolan',
+    database: process.env.DB,
+    user: process.env.US,
+    password: process.env.PW,
     stream: socksConn
   }
 
