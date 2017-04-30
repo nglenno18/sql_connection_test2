@@ -96,7 +96,7 @@ var serv = app.listen(port, function(){
   });
 
 
-  app.get('/timesheets/:id/:foreman/:project/:formid/:employees/:cc:/st', function(request, response){
+  app.get('/timesheets/:id/:foreman/:project/:formid/:employees/:cc', function(request, response){
     //bodyparser takes JSON, converts to object
     console.log(request.body); //body gets stored by the bodyParser^^^
 
