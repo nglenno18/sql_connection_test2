@@ -24,7 +24,6 @@ var serv = app.listen(port, function(){
   console.log('App listening on port %s', serv.address().port);
   console.log('Press Ctrl+C to quit');
 
-
     connection = mysql.createConnection({
         host: '107.178.214.50',
         user     : 'root',
@@ -32,10 +31,16 @@ var serv = app.listen(port, function(){
         database : 'db1'
     });
 
+    app.get('/', function(err, res){
+      console.log(err);
+      console.log(res);
+      return res.status(200).send('done');
+    });
     // app.get('/files', function(request, response){
       connection.connect(function(err){
         if(!err) {
             console.log("\n\nDatabase is connected ... \n\n");
+
         } else {
             console.log("Error connecting database ... \n\n", err);
         }
