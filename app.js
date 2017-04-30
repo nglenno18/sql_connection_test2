@@ -58,27 +58,32 @@ var serv = app.listen(port, function(){
   console.log('App listening on port %s', serv.address().port);
   console.log('Press Ctrl+C to quit');
 
-  schedule.scheduleJob(rule, function(){
-    herokutest(function(array){
-      console.log('RULE 1 -- callback called', array);
-        return (array);
-    });
-  });
+  // schedule.scheduleJob(rule, function(){
+  //   herokutest(function(array){
+  //     console.log('RULE 1 -- callback called', array);
+  //       return (array);
+  //   });
+  // });
 
-  var rule2 = new schedule.RecurrenceRule();
-  rule2.second = 25;
-  rule2.dayOfWeek = [0, new schedule.Range(0,6)];
-  schedule.scheduleJob(rule2, function(){
-    herokutest(function(array){
-      console.log('RULE 2 -- callback called', array);
-        return (array);
-    });
-  })
+  // var rule2 = new schedule.RecurrenceRule();
+  // rule2.second = 25;
+  // rule2.dayOfWeek = [0, new schedule.Range(0,6)];
+  // schedule.scheduleJob(rule2, function(){
+  //   herokutest(function(array){
+  //     console.log('RULE 2 -- callback called', array);
+  //       return (array);
+  //   });
+  // })
 
   app.use(bodyParser.json());
 
   app.get('/records', function(err, res){
     res.status(200).send(timestamps);
+  });
+  app.get('/clearall', function(request, response){
+    clearTimesheets(function(result){
+      return response.status(200).send(result);
+    });
   });
 
   app.get('/search/:id', function(request, response){
@@ -111,38 +116,125 @@ var serv = app.listen(port, function(){
     }
 
     console.log(tm);
-    addTeamsheet(tm, function(array){
-      console.log('callback called', array);
-        return response.status(200).send(tm);
-    });
-    // return response.status(200).send(tm);
 
-    // todo.save().then(function(doc){
-    //   response.send(doc);
-    // }, function(error){
-    //   response.status(400).send(error);
-    //   console.log('Unable to create the Todo: ');
-    //   console.log(error.errors.text.message);
+    var crew = tm.employees.split(',');
+    console.log('\n\nCrew Members on this Sheet: ', crew);
+
+    var x = 0;
+    var crewsheets = [];
+    for(x = 0; x < crew.length; x++){
+        var emp = crew[x];
+        console.log(emp);
+        var sheet = {
+          UniqueID: tm.UniqueID + x,
+          project: tm.project,
+          formid: tm.formid,
+          d:tf,
+          ts: 'no',
+          employee: emp,
+          cost_code: tm.cost_code,
+          timein: tm.timein,
+          teamsheet: tm.UniqueID,
+          trade: 'none'
+        }
+        console.log(sheet);
+        crewsheets.push(sheet);
+        addTeamsheet(sheet, function(array){
+          console.log('callback called', array);
+            // return response.status(200).send(sheet);
+        });
+    }
+    return response.status(200).send(crewsheets);
+
+
+    // addTimesheets(crewsheets, function(array){
+    //   console.log('\n\n\n\n\nAdding a set of Timesheets based off a Teamsheet\n\tCallback CALLED: ', array);
+    //   return response.status(200).send(array);
+    // })
+
+    // addTeamsheet(tm, function(array){
+    //   console.log('callback called', array);
+    //     return response.status(200).send(tm);
     // });
   });
-
     app.get('/', function(err, res){
       herokutest(function(array){
         console.log('callback called', array);
           return res.status(200).send(array);
       });
-
-      // sqlQuery_test(function(array){
-      //   console.log('callback called', array);
-      //   // return sqlQuery_test(function(array){
-      //   //   console.log('callback called', array);
-      //   //     return res.status(200).send(array);
-      //   // });
-      //     return res.status(200).send(array);
-      // });
     });
 }); //EnD APP LISTEN()
 
+
+
+var clearTimesheets = function(callback){
+  establishProxy(function(mysql_options){
+    var mysqlConn = mysql2.createConnection(mysql_options);
+    var arr;
+    return mysqlConn.connect(function(err){
+      if(err){console.log(err);}
+      else{
+        console.log('\n\nDatabase Connected!');
+        var t = new Date();
+        var tf = t.toString("MMM/DD/yy   hh:mm: aa");
+        console.log('TIME: ', t.toString("hh:mm: aa"));
+        console.log(tf);
+        // timestamps.push(tf);
+
+        // return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +' \', \'\', \'\');', function(err, rows) {
+        return mysqlConn.query('DELETE FROM timesheets WHERE UniqueID != \'l\';', function(err, rows) {
+          arr = rows;
+          console.log('Result: ', rows);
+          console.log('Error: ', err);
+
+          return mysqlConn.end(function(err){
+            if(err) return console.log(err);
+            console.log('\tDatabase DISCONNECTED!');
+            var t = new Date();
+            console.log('\t TIME: ', t.toString("hh:mm: tt"));
+            console.log('\n\n\n');
+            callback(rows);
+            //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
+          });
+        });
+      }
+    })
+  });
+}
+
+var addTimesheets = function(crewsheets,callback){
+  establishProxy(function(mysql_options){
+    var mysqlConn = mysql2.createConnection(mysql_options);
+    var arr;
+    return mysqlConn.connect(function(err){
+      if(err){console.log(err);}
+      else{
+        console.log('\n\nDatabase Connected!');
+        var t = new Date();
+        var tf = t.toString("MMM/DD/yy   hh:mm: aa");
+        console.log('TIME: ', t.toString("hh:mm: aa"));
+        console.log(tf);
+        // timestamps.push(tf);
+
+        console.log('\n\nCREWSHEETS to INPUT into SQL: ', crewsheets);
+        var i = 0;
+        for(i = 0; i < crewsheets.length; i++){
+          var entry = crewsheets[i];
+          if(i = crewsheets.length - 1){
+            callback(mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
+              console.log(err);
+              console.log('Result: ', rows);
+            }))
+          }
+          mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
+            console.log(err);
+            console.log('Result: ', rows);
+          });
+        }
+      }
+    })
+  });
+}
 
 var findTimesheet = function(id, callback){
   var socksConn = new SocksConnection(mysql_server_options, socks_options);
@@ -188,57 +280,61 @@ var findTimesheet = function(id, callback){
 }
 
 var addTeamsheet = function(entry, callback){
+  establishProxy(function(mysql_options){
+    var mysqlConn = mysql2.createConnection(mysql_options);
+    var arr;
+    return mysqlConn.connect(function(err){
+      if(err){console.log(err);}
+      else{
+        console.log('\n\nDatabase Connected!');
+        var t = new Date();
+        var tf = t.toString("MMM/DD/yy   hh:mm: aa");
+        console.log('TIME: ', t.toString("hh:mm: aa"));
+        console.log(tf);
+        // timestamps.push(tf);
+
+        console.log('\n\n\n\nENTRY:', entry);
+
+        return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
+        // return mysqlConn.query('SELECT * FROM timesheets;', function(err, rows) {
+          arr = rows;
+          console.log('Result: ', rows);
+          console.log('Error: ', err);
+
+          return mysqlConn.end(function(err){
+            if(err) return console.log(err);
+            console.log('\tDatabase DISCONNECTED!');
+            var t = new Date();
+            console.log('\t TIME: ', t.toString("hh:mm: tt"));
+            console.log('\n\n\n');
+            callback(rows);
+            //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
+          });
+        });
+      }
+    })
+})
+}
+
+var establishProxy = function(callback){
   var socksConn = new SocksConnection(mysql_server_options, socks_options);
 
   // console.log(socksConn);
   var mysql_options =  {
-    database: 'db1',
-    user: 'root',
-    password: 'nolan',
+    database: process.env.DB,
+    user: process.env.US,
+    password: process.env.PW,
     stream: socksConn
   }
-
-  var mysqlConn = mysql2.createConnection(mysql_options);
-  var arr;
-  return mysqlConn.connect(function(err){
-    if(err){console.log(err);}
-    else{
-      console.log('\n\nDatabase Connected!');
-      var t = new Date();
-      var tf = t.toString("MMM/DD/yy   hh:mm: aa");
-      console.log('TIME: ', t.toString("hh:mm: aa"));
-      console.log(tf);
-      // timestamps.push(tf);
-
-      console.log('\n\n\n\nENTRY:', entry);
-
-      return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + entry.st +'\', \'' + entry.foreman +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
-      // return mysqlConn.query('SELECT * FROM timesheets;', function(err, rows) {
-        arr = rows;
-        console.log('Result: ', rows);
-        console.log('Error: ', err);
-
-        return mysqlConn.end(function(err){
-          if(err) return console.log(err);
-          console.log('\tDatabase DISCONNECTED!');
-          var t = new Date();
-          console.log('\t TIME: ', t.toString("hh:mm: tt"));
-          console.log('\n\n\n');
-          callback(rows);
-          //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
-        });
-      });
-    }
-  })
+  callback(mysql_options);
 }
-
 
 var sqlQuery_test = function(callback){
   connection = mysql.createConnection({
-      host: '107.178.214.50',
-      user     : 'root',
-      password : 'nolan',
-      database : 'db1'
+      host: process.env.HOST,
+      database: process.env.DB,
+      user: process.env.US,
+      password: process.env.PW
   });
   connection.connect(function(err){
     if(!err) {
@@ -300,9 +396,9 @@ var herokutest = function(callback){
 
   // console.log(socksConn);
   var mysql_options =  {
-    database: 'db1',
-    user: 'root',
-    password: 'nolan',
+    database: process.env.DB,
+    user: process.env.US,
+    password: process.env.PW,
     stream: socksConn
   }
 
