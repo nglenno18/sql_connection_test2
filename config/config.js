@@ -1,7 +1,7 @@
 var env = process.env.NODE_ENV || 'development'; //need to configure NODE_ENV in package.json
 console.log(`***********ENVIRONMENT: `, env);
 
-if(env=== 'development' || env === 'test' || env === 'test '){
+// if(env=== 'development' || env === 'test' || env === 'test '){
   //LOAD in a SEPERATE json file where DEV and TEST config variables will live
       //that file ^^ config.json will NOT be part of git repo
   //REQUIRE the JSON file --> parse into object
@@ -12,7 +12,7 @@ if(env=== 'development' || env === 'test' || env === 'test '){
   Object.keys(envConfig).forEach(function(key){ //callback gets called with each item
     process.env[key] = envConfig[key];  //set the process.env keys as the local
   });
-}
+// }
 
 console.log(`\n       PORT:`);
 console.log(`QUOTAGUARDSTATIC_URL:`);
