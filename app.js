@@ -27,7 +27,11 @@ var serv = app.listen(port, function(){
 
     app.get('/', function(err, res){
 
-      herokutest();
+      herokutest(function(array){
+        console.log('callback called', array);
+
+          return res.status(200).send(array);
+      });
 
       // sqlQuery_test(function(array){
       //   console.log('callback called', array);
@@ -85,7 +89,7 @@ var sqlQuery_test = function(callback){
 
 }
 
-var herokutest = function(){
+var herokutest = function(callback){
   var options, url, proxy;
   // http = require("http");
   url = require("url");
@@ -135,17 +139,18 @@ var herokutest = function(){
   }
 
   var mysqlConn = mysql2.createConnection(mysql_options);
-
-  mysqlConn.connect(function(err){
+  var arr;
+  return mysqlConn.connect(function(err){
     if(err){console.log(err);}
     else{
-      mysqlConn.query('SELECT 1+1 as test1;', function(err, rows, fields) {
+      return mysqlConn.query('SELECT 1+1 as test1;', function(err, rows, fields) {
         // if (err) throw err;
 
+        arr = rows;
         console.log('Result: ', rows);
 
-        mysqlConn.end(function(err){
-          return rows;
+        return mysqlConn.end(function(err){
+          callback(rows);
           //PERFECT --> now go to udemy, review how to config HEROKU env. variables to stuff?
         });
       });
