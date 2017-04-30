@@ -24,52 +24,59 @@ var serv = app.listen(port, function(){
   console.log('App listening on port %s', serv.address().port);
   console.log('Press Ctrl+C to quit');
 
-    connection = mysql.createConnection({
-        host: '107.178.214.50',
-        user     : 'root',
-        password : 'nolan',
-        database : 'db1'
-    });
-
     app.get('/', function(err, res){
-      console.log(err);
-      console.log(res);
-      return res.status(200).send('done');
+      sqlQuery_test(function(array){
+        console.log('callback called', array);
+        // return sqlQuery_test(function(array){
+        //   console.log('callback called', array);
+        //     return res.status(200).send(array);
+        // });
+          return res.status(200).send(array);
+      });
     });
-    // app.get('/files', function(request, response){
-      connection.connect(function(err){
-        if(!err) {
-            console.log("\n\nDatabase is connected ... \n\n");
-
-        } else {
-            console.log("Error connecting database ... \n\n", err);
-        }
-      });
-
-
-      tablename = 'times';
-      console.log('Table = TIMES');
-        var array = [];
-
-      connection.query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' + tablename + '\';', function(er, res){
-        var x = 0;
-        for(x = 0; x < res.length; x++){
-          array.push(res[x].COLUMN_NAME);
-        }
-        console.log(`\n\n\n\nFetching Fields for TABLE: `, tablename);
-        console.log(`\t\t${tablename.toUpperCase()} --> DONE`);
-        console.log(`\t\t${res.length} Fields in`, tablename);
-
-        // console.log(`\n\nFIELDS for ${tablename}`, array);
-        // return array;
-
-        return connection.end(function(err){
-          if(!err) {
-              console.log("\n\nDatabase is DISCONNECTED ... \n\n");
-          } else {
-              console.log("Error DIS-connecting database ... \n\n", err);
-          }
-        });
-      });
-    // }); //END app.get()
 }); //EnD APP LISTEN()
+
+var sqlQuery_test = function(callback){
+  connection = mysql.createConnection({
+      host: '107.178.214.50',
+      user     : 'root',
+      password : 'nolan',
+      database : 'db1'
+  });
+  connection.connect(function(err){
+    if(!err) {
+        console.log("\n\nDatabase is connected ... \n\n");
+
+    } else {
+        console.log("Error connecting database ... \n\n", err);
+    }
+  });
+
+
+  tablename = 'times';
+  console.log('Table = TIMES');
+    var array = [];
+
+  connection.query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = \'' + tablename + '\';', function(er, res){
+    var x = 0;
+    for(x = 0; x < res.length; x++){
+      array.push(res[x].COLUMN_NAME);
+    }
+    console.log(`\n\n\n\nFetching Fields for TABLE: `, tablename);
+    console.log(`\t\t${tablename.toUpperCase()} --> DONE`);
+    console.log(`\t\t${res.length} Fields in`, tablename);
+
+    // console.log(`\n\nFIELDS for ${tablename}`, array);
+    // return array;
+
+    connection.end(function(err){
+      if(!err) {
+          console.log("\n\nDatabase is DISCONNECTED ... \n\n");
+          callback(array);
+      } else {
+          console.log("Error DIS-connecting database ... \n\n", err);
+      }
+    });
+  });
+
+}
