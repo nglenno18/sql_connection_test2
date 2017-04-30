@@ -19,20 +19,24 @@ var SocksConnection = require('socksjs');
 
 QUOTAGUARDSTATIC_URL = 'http://quotaguard10225:7bf9752701f9@proxy.quotaguard.com:9292';
 
+QUOTAGUARDSTATIC_URL = 'http://7zl0kq03hlfpvy:8t9f75KusaE2TDhlqd8XpjscKw@us-east-1-static.quotaguard.com:9293';
 
 var serv = app.listen(port, function(){
   console.log('App listening on port %s', serv.address().port);
   console.log('Press Ctrl+C to quit');
 
     app.get('/', function(err, res){
-      sqlQuery_test(function(array){
-        console.log('callback called', array);
-        // return sqlQuery_test(function(array){
-        //   console.log('callback called', array);
-        //     return res.status(200).send(array);
-        // });
-          return res.status(200).send(array);
-      });
+
+      herokutest();
+
+      // sqlQuery_test(function(array){
+      //   console.log('callback called', array);
+      //   // return sqlQuery_test(function(array){
+      //   //   console.log('callback called', array);
+      //   //     return res.status(200).send(array);
+      //   // });
+      //     return res.status(200).send(array);
+      // });
     });
 }); //EnD APP LISTEN()
 
@@ -78,5 +82,74 @@ var sqlQuery_test = function(callback){
       }
     });
   });
+
+}
+
+var herokutest = function(){
+  var options, url, proxy;
+  // http = require("http");
+  url = require("url");
+  proxy = url.parse(QUOTAGUARDSTATIC_URL); // <-- proxy url
+  var username = proxy.auth.split(':')[0];
+  var password = proxy.auth.split(':')[1];
+
+  // target  = url.parse("http://ip.jsontest.com/");
+  //
+  // options = {
+  //   hostname: proxy.hostname,
+  //   port: proxy.port || 80,
+  //   path: target.href,
+  //   headers: {
+  //     "Proxy-Authorization": "Basic " + (new Buffer(proxy.auth).toString("base64")),
+  //     "Host" : target.hostname
+  //   }
+  // };
+  //
+  // http.get(options, function(res) {
+  //   res.pipe(process.stdout);
+  //   return console.log("status code", res.statusCode);
+  // });
+
+  var SocksConnection = require('socksjs');
+
+  var mysql_server_options = {
+    host: '107.178.214.50',
+    port: 3306
+  };
+
+  var socks_options = {
+    host: proxy.hostname,
+    port: 1080,
+    user: username,
+    pass: password
+  };
+
+  var socksConn = new SocksConnection(mysql_server_options, socks_options);
+
+  console.log(socksConn);
+  var mysql_options =  {
+    database: 'db1',
+    user: 'root',
+    password: 'nolan',
+    stream: socksConn
+  }
+
+  var mysqlConn = mysql2.createConnection(mysql_options);
+
+  mysqlConn.connect(function(err){
+    if(err){console.log(err);}
+    else{
+      mysqlConn.query('SELECT 1+1 as test1;', function(err, rows, fields) {
+        // if (err) throw err;
+
+        console.log('Result: ', rows);
+
+        mysqlConn.end(function(err){
+          return rows;
+          //PERFECT --> now go to udemy, review how to config HEROKU env. variables to stuff?
+        });
+      });
+    }
+  })
 
 }
