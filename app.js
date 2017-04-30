@@ -96,7 +96,7 @@ var serv = app.listen(port, function(){
   });
 
 
-  app.get('/timesheets/:id/:foreman/:project/:formid/:d/:employees/:cc:/st', function(request, response){
+  app.get('/timesheets/:id/:foreman/:project/:formid/:employees/:cc:/st', function(request, response){
     //bodyparser takes JSON, converts to object
     console.log(request.body); //body gets stored by the bodyParser^^^
 
@@ -110,7 +110,7 @@ var serv = app.listen(port, function(){
       foreman: request.params.foreman,
       project: project,
       formid: formid,
-      d:d,
+      d:tf,
       ts: 'no',
       employees: employees,
       cost_code: cc,
