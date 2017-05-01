@@ -145,7 +145,7 @@ var serv = app.listen(port, function(){
         });
     }
     // return response.status(200).send(JSON.stringify(crewsheets, undefined, 2));
-    return response.redirect(process.env.RD);
+    return response.redirect(process.env.RD + tm.UniqueID);
 
     // addTimesheets(crewsheets, function(array){
     //   console.log('\n\n\n\n\nAdding a set of Timesheets based off a Teamsheet\n\tCallback CALLED: ', array);
