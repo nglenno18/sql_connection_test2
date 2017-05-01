@@ -6,7 +6,7 @@ const port = process.env.PORT || 3001;
 var express = require('express');
 var bodyParser = require('body-parser');
 const mysql = require('mysql');
-
+// var jquery = require('');
 
 var timestamps = [];
 require('./config/config.js');
@@ -144,8 +144,8 @@ var serv = app.listen(port, function(){
             // return response.status(200).send(sheet);
         });
     }
-    return response.status(200).send(crewsheets);
-
+    // return response.status(200).send(JSON.stringify(crewsheets, undefined, 2));
+    return response.redirect(process.env.RD);
 
     // addTimesheets(crewsheets, function(array){
     //   console.log('\n\n\n\n\nAdding a set of Timesheets based off a Teamsheet\n\tCallback CALLED: ', array);
