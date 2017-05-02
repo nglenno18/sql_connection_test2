@@ -99,17 +99,19 @@ var serv = app.listen(port, function(){
     console.log(request.body); //body gets stored by the bodyParser^^^
 
     var t = new Date();
-    var tf = t.toString("MMM/DD/yy   hh:mm: aa");
-    console.log('TIME: ', t.toString("hh:mm: aa"));
+    var tf = t.toString("hh:mm tt");
+    console.log('TIME: ', t.toString("hh:mm tt"));
 
+    var t = request.params.st;
+    t = t.replace('-', ':');
     //now actually create a todo from input from the User
     var tm = {
       UniqueID: request.params.id,
       foreman: request.params.foreman,
       project: request.params.project,
       formid: request.params.formid,
-      d:tf,
-      ts: 'no',
+      d:t.toString("mm/dd/yyyy"),
+      ts: 'TEAMsheet',
       employees: request.params.employees,
       cost_code: request.params.cc,
       timein:request.params.st
@@ -129,8 +131,8 @@ var serv = app.listen(port, function(){
           UniqueID: tm.UniqueID + x,
           project: tm.project,
           formid: tm.formid,
-          d:tf,
-          ts: 'no',
+          d:t.toString('mm/dd/yyy'),
+          ts: 'TIMEsheet',
           employee: emp,
           cost_code: tm.cost_code,
           timein: tm.timein,
@@ -144,18 +146,9 @@ var serv = app.listen(port, function(){
             // return response.status(200).send(sheet);
         });
     }
-    // return response.status(200).send(JSON.stringify(crewsheets, undefined, 2));
+    // return response.status(200).send(JSON.stringify(crewsheets, 2, undefined));
     return response.redirect(process.env.RD + request.params.id);
 
-    // addTimesheets(crewsheets, function(array){
-    //   console.log('\n\n\n\n\nAdding a set of Timesheets based off a Teamsheet\n\tCallback CALLED: ', array);
-    //   return response.status(200).send(array);
-    // })
-
-    // addTeamsheet(tm, function(array){
-    //   console.log('callback called', array);
-    //     return response.status(200).send(tm);
-    // });
   });
     app.get('/', function(err, res){
       herokutest(function(array){
@@ -221,12 +214,12 @@ var addTimesheets = function(crewsheets,callback){
         for(i = 0; i < crewsheets.length; i++){
           var entry = crewsheets[i];
           if(i = crewsheets.length - 1){
-            callback(mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
+            callback(mysqlConn.query('INSERT INTO timesheets2 VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
               console.log(err);
               console.log('Result: ', rows);
             }))
           }
-          mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
+          mysqlConn.query('INSERT INTO timesheets2 VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows){
             console.log(err);
             console.log('Result: ', rows);
           });
@@ -260,7 +253,7 @@ var findTimesheet = function(id, callback){
       // timestamps.push(tf);
 
       // return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +' \', \'\', \'\');', function(err, rows) {
-      return mysqlConn.query('SELECT * FROM timesheets WHERE UniqueID LIKE \'\%' + id + '\%\';', function(err, rows) {
+      return mysqlConn.query('SELECT * FROM timesheets2 WHERE UniqueID LIKE \'\%' + id + '\%\';', function(err, rows) {
         arr = rows;
         console.log('Result: ', rows);
         console.log('Error: ', err);
@@ -294,23 +287,59 @@ var addTeamsheet = function(entry, callback){
         // timestamps.push(tf);
 
         console.log('\n\n\n\nENTRY:', entry);
+        var n = '';
+        var nh = '00:00:00';
+        var tt = 'ST';
+        var no = 'No';
 
-        return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
-        // return mysqlConn.query('SELECT * FROM timesheets;', function(err, rows) {
-          arr = rows;
-          console.log('Result: ', rows);
-          console.log('Error: ', err);
+        // return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err,rows){
+        return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + entry.UniqueID +'\', \'' + entry.project +'\', ' +
+        '\'' + entry.formid +'\', \'' + entry.d +'\',' +
+        '\'' + entry.ts +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + entry.employee +'\',' +
+        '\'' + entry.cost_code +'\', \'' + entry.trade +'\',' +
+        '\'' + entry.timein +'\', \'' + n +'\',' +
+        '\'' + nh +'\', \'' + tt +'\',' +
+        '\'' + entry.teamsheet +'\', \'' + no +'\',' +
+        '\'' + n +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + n +'\',' +
+        '\'' + n +'\', \'' + n +'\''
+        +
+        ');', function(err,rows){
+            arr = rows;
+            console.log('Result: ', rows);
+            console.log('Error: ', err);
 
-          return mysqlConn.end(function(err){
-            if(err) return console.log(err);
-            console.log('\tDatabase DISCONNECTED!');
-            var t = new Date();
-            console.log('\t TIME: ', t.toString("hh:mm: tt"));
-            console.log('\n\n\n');
-            callback(rows);
-            //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
-          });
+            return mysqlConn.end(function(err){
+              if(err) return console.log(err);
+              console.log('\tDatabase DISCONNECTED!');
+              var t = new Date();
+              console.log('\t TIME: ', t.toString("hh:mm: tt"));
+              console.log('\n\n\n');
+              callback(rows);
+              //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
+            });
         });
+
+
+        // return mysqlConn.query('INSERT INTO timesheets2 VALUES(\'' + tf +'\', \'' + entry.employee +'\', \'' + entry.UniqueID +'\');', function(err, rows) {
+        //   arr = rows;
+        //   console.log('Result: ', rows);
+        //   console.log('Error: ', err);
+        //
+        //   return mysqlConn.end(function(err){
+        //     if(err) return console.log(err);
+        //     console.log('\tDatabase DISCONNECTED!');
+        //     var t = new Date();
+        //     console.log('\t TIME: ', t.toString("hh:mm: tt"));
+        //     console.log('\n\n\n');
+        //     callback(rows);
+        //     //PERFECT --> now udemy, review how to config HEROKU env. variables to stuff?
+        //   });
+        // });
       }
     })
 })
@@ -415,7 +444,7 @@ var herokutest = function(callback){
       timestamps.push(tf);
 
       // return mysqlConn.query('INSERT INTO timesheets VALUES(\'' + tf +' \', \'\', \'\');', function(err, rows) {
-      return mysqlConn.query('SELECT * FROM timesheets;', function(err, rows) {
+      return mysqlConn.query('SELECT * FROM timesheets2;', function(err, rows) {
         arr = rows;
         console.log('Result: ', rows);
         console.log('Error: ', err);
