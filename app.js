@@ -94,7 +94,7 @@ var serv = app.listen(port, function(){
   });
 
 
-  app.get('/timesheets/:id/:foreman/:project/:formid/:employees/:cc/:st', function(request, response){
+  app.get('/timesheets/:id/:foreman/:project/:formid/:employees/:cc/:st/:da', function(request, response){
     //bodyparser takes JSON, converts to object
     console.log(request.body); //body gets stored by the bodyParser^^^
 
@@ -104,17 +104,19 @@ var serv = app.listen(port, function(){
 
     var t = request.params.st;
     t = t.replace('-', ':');
+
+
     //now actually create a todo from input from the User
     var tm = {
       UniqueID: request.params.id,
       foreman: request.params.foreman,
       project: request.params.project,
       formid: request.params.formid,
-      d:t.toString("mm/dd/yyyy"),
+      d: request.params.da,
       ts: 'TEAMsheet',
       employees: request.params.employees,
       cost_code: request.params.cc,
-      timein:request.params.st
+      timein:t
     }
 
     console.log(tm);
@@ -131,7 +133,7 @@ var serv = app.listen(port, function(){
           UniqueID: tm.UniqueID + x,
           project: tm.project,
           formid: tm.formid,
-          d:t.toString('mm/dd/yyy'),
+          d:tm.d,
           ts: 'TIMEsheet',
           employee: emp,
           cost_code: tm.cost_code,
@@ -139,12 +141,15 @@ var serv = app.listen(port, function(){
           teamsheet: tm.UniqueID,
           trade: 'none'
         }
+
         console.log(sheet);
-        crewsheets.push(sheet);
-        addTeamsheet(sheet, function(array){
-          console.log('callback called', array);
-            // return response.status(200).send(sheet);
-        });
+        if(emp != tm.foreman){
+          crewsheets.push(sheet);
+          addTeamsheet(sheet, function(array){
+            console.log('callback called', array);
+              // return response.status(200).send(sheet);
+          });
+        }
     }
     // return response.status(200).send(JSON.stringify(crewsheets, 2, undefined));
     return response.redirect(process.env.RD + request.params.id);
