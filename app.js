@@ -128,7 +128,7 @@ var serv = app.listen(port, function(){
     var crewsheets = [];
     for(x = 0; x < crew.length; x++){
         var emp;
-        if(crew[x].charAt(0)=' '){
+        if(crew[x].charAt(0)== ' '){
           emp = crew[x].substring(1);
         }else{
           emp = crew[x];
