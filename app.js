@@ -127,7 +127,12 @@ var serv = app.listen(port, function(){
     var x = 0;
     var crewsheets = [];
     for(x = 0; x < crew.length; x++){
-        var emp = crew[x];
+        var emp;
+        if(crew[x].charAt(0)=' '){
+          emp = crew[x].substring(1);
+        }else{
+          emp = crew[x];
+        }
         console.log(emp);
         var sheet = {
           UniqueID: tm.UniqueID + x,
