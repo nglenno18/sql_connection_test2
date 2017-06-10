@@ -173,7 +173,7 @@ var serv = app.listen(port, function(){
         entryarray.push(entry.employee);
         entryarray.push(entry.cost_code);
         entryarray.push(entry.timein);
-        entryarray.push(entry.timeout);
+        if(entry.timeout != '00:00-00')entryarray.push(entry.timeout);
         entryarray.push(entry.hours);
         entryarray.push(entry.teamsheet);
         entryarray.push(entry.requested);
@@ -258,10 +258,15 @@ var addBatchTimesheets = function(entry, callback){
         var tt = 'ST';
         var no = 'No';
 
-
-        return mysqlConn.query(
-        'INSERT INTO timesheets(UniqueID,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,end_time,hours,parent_sheet, requested)'+
-        ' VALUES ?;', [entry], function(err,rows){
+        var statement = 'INSERT INTO timesheets(UniqueID,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,end_time,hours,parent_sheet, requested)'+
+        ' VALUES ?;';
+        if(entry[0].length === 14){
+          statement = 'INSERT INTO timesheets(UniqueID,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,hours,parent_sheet, requested)'+
+          ' VALUES ?;';
+        }
+        console.log(entry[0].length);
+        console.log(statement);
+        return mysqlConn.query(statement, [entry], function(err,rows){
             arr = rows;
             console.log('Result: ', rows);
             console.log('Error: ', err);
