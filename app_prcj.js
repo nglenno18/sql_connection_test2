@@ -86,7 +86,7 @@ var serv = app.listen(port, function(){
     var t = request.params.st;
     t = t.replace('-', ':');
 
-    var to = request.params.st.replace('-', ':');
+    var to = request.params.timeout.replace('-', ':');
     var type = request.params.type;
 
     // var count = (t.match(/is/g) || []).length;
