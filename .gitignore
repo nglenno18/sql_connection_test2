@@ -1,3 +1,4 @@
 node_modules/
 config/config.json
 app_backup.js
+app.js
