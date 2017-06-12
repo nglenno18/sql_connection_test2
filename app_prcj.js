@@ -91,6 +91,9 @@ var serv = app.listen(port, function(){
       to = '00:00-00';
     }
     var type = request.params.type;
+    if(type === 'Construction') type = 'Construction Project';
+    if(type === 'Pavement') type = 'Pavement Restoration';
+
 
     // var count = (t.match(/is/g) || []).length;
     // for( var e = 0; e < count; e++){
@@ -120,7 +123,7 @@ var serv = app.listen(port, function(){
       hours: hr
     }
 
-    if(type == 'Pavement'){
+    if(type == 'Pavement Restoration'){
       tm.cons_proj = "";
       tm.cons_id = "";
       tm.pr_proj = request.params.project;
@@ -144,6 +147,7 @@ var serv = app.listen(port, function(){
         console.log(emp);
         var sheet = {
           UniqueID: tm.UniqueID + '' + x,
+          type: type,
           cons_proj: tm.cons_proj,
           cons_id: tm.cons_id,
           pr_proj: tm.pr_proj,
@@ -163,6 +167,7 @@ var serv = app.listen(port, function(){
         var entry = sheet;
         var entryarray = [];
         entryarray.push(entry.UniqueID);
+        entryarray.push(entry.type);
         entryarray.push(entry.cons_proj);
         entryarray.push(entry.cons_id);
         entryarray.push(entry.pr_proj);
@@ -258,10 +263,10 @@ var addBatchTimesheets = function(entry, callback){
         var tt = 'ST';
         var no = 'No';
 
-        var statement = 'INSERT INTO timesheets(UniqueID,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,end_time,hours,parent_sheet, requested)'+
+        var statement = 'INSERT INTO timesheets(UniqueID,\`Project Type\`,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,end_time,hours,parent_sheet, requested)'+
         ' VALUES ?;';
-        if(entry[0].length === 14){
-          statement = 'INSERT INTO timesheets(UniqueID,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,hours,parent_sheet, requested)'+
+        if(entry[0].length === 15){
+          statement = 'INSERT INTO timesheets(UniqueID,\`Project Type\`,cons_proj,cons_id,pr_proj,pr_id,date,sheet_type,foreman,employee,cost_code,start_time,hours,parent_sheet, requested)'+
           ' VALUES ?;';
         }
         console.log(entry[0].length);
