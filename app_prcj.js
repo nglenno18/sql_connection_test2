@@ -1,7 +1,10 @@
+
+
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
 const publicPath = path.join(__dirname, '../public');
+const htmlPath = path.join(__dirname, '/public/close.html');
 const port = process.env.PORT || 3001;
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -194,7 +197,11 @@ var serv = app.listen(port, function(){
       console.log('Batch timesheets sent: RESULT:', res);
     });
     // return response.status(200).send(JSON.stringify(crewsheets, 2, undefined));
-    return response.redirect(process.env.RD + request.params.id);
+    // console.log("/close.html");
+    // return response.redirect(process.env.RD + request.params.id);
+    console.log(htmlPath);
+    return response.redirect(htmlPath);
+    // return response.redirect("<script>window.close()</script>");
 
   });
 
