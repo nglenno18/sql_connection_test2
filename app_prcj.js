@@ -200,6 +200,8 @@ var serv = app.listen(port, function(){
     // console.log("/close.html");
     // return response.redirect(process.env.RD + request.params.id);
     console.log(htmlPath);
+    app.use(express.static(publicPath));
+
     return response.redirect(htmlPath);
     // return response.redirect("<script>window.close()</script>");
 
