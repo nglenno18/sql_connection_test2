@@ -1,4 +1,4 @@
-
+//@grant window.close()
 
 const path = require('path');
 const http = require('http');
