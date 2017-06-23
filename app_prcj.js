@@ -195,13 +195,13 @@ var serv = app.listen(port, function(){
       console.log('Batch timesheets sent: ERROR:', err);
       console.log('Batch timesheets sent: RESULT:', res);
       if(res){
-        return response.send("Success! Please sync the application");
+        return response.redirect(process.env.RD + request.params.id);
+        // return response.send("Success! Please sync the application");
       }else {
         return response.send("Failed!");
       }
     });
     // return response.status(200).send(JSON.stringify(crewsheets, 2, undefined));
-    // return response.redirect(process.env.RD + request.params.id);
   });
 }); //EnD APP LISTEN()
 
