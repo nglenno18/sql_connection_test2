@@ -195,8 +195,9 @@ var serv = app.listen(port, function(){
       console.log('Batch timesheets sent: ERROR:', err);
       console.log('Batch timesheets sent: RESULT:', res);
       if(res){
-        return response.redirect(process.env.RD + request.params.id);
-        // return response.send("Success! Please sync the application");
+        // return response.redirect(process.env.RD + request.params.id);
+
+        return response.send("<a href= " + process.env.RD + request.params.id +">Success! Please sync the Application</a>");
       }else {
         return response.send("Failed!");
       }
