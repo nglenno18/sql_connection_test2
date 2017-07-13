@@ -3,8 +3,17 @@
 <html>
 	<head>
 		<title>Nolan </title>
+		<script language="javascript" type="text/javascript">
+			function closeWindow() {
+			window.open('','_parent','');
+			window.close();
+		}
+		</script>
 	</head>
 	<body>
+		<a href="javascript:window.open('','_parent','').close();">Close Window</a>
+		<!-- http://www.gtalbot.org/BrowserBugsSection/MSIE7Bugs/ClosingWindowsNotOpenedByJS.html -->
+		<a href="javascript:window.location.href(" + process.env.RD + request.params.id + ");>Success! Please sync the Application</a>
 		<h1 id="top"><img src="blackhawks.jpg" width="100" align="center"></h1>
 
 		<ul>
